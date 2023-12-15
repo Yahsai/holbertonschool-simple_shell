@@ -1,140 +1,190 @@
-#include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/wait.h>
 
-#define MAX_INPUT_SIZE 1024
+#define MAX_COMMAND_LENGTH 100
+#define MAX_ARGS 10
 
 /**
- * display_prompt - Display the shell prompt
+ * is_builtin_command - determines whether given command is built-in or not
+ * @command: the given command
+ * Return: 0
  */
-void display_prompt(void)
+
+int is_builtin_command(char *command)
 {
-    printf("simple_shell$ ");
+	if (strcmp(command, "exit") == 0 || strcmp(command, "clear")
+	== 0 || strcmp(command, "cd") == 0 || strcmp(command, "env") == 0)
+	{
+		return (1);
+	}
+	return (0);
 }
 
 /**
- * execute_command - Execute a command in a child process
- * @command: The command to be executed
+ * print_environment - prints the environment variables that are
+ * passed to the program when it starts
+ * @env: array of strings that contain environment variables
+ * Return: nothing
  */
-void execute_command(char *command)
+
+void print_environment(char **env)
 {
-    pid_t pid = fork();
-
-    if (pid == -1)
-    {
-        perror("fork");
-    }
-    else if (pid == 0) /* Child process */
-    {
-        char *args[MAX_INPUT_SIZE];
-        char *token;
-        int i = 0;
-
-        /* Tokenize the command */
-        token = strtok(command, " \t\n");
-        while (token != NULL)
-        {
-            args[i++] = token;
-            token = strtok(NULL, " \t\n");
-        }
-        args[i] = NULL;
-
-        /* Execute the command using PATH */
-        execvp(args[0], args);
-
-        /* If execvp fails */
-        perror("execvp");
-
-        /* Exit the child process if the command doesn't exist */
-        exit(EXIT_FAILURE);
-    }
-    else /* Parent process */
-    {
-        /* Wait for the child to complete */
-        waitpid(pid, NULL, 0);
-    }
+	while (*env != NULL)
+	{
+		printf("%s\n", *env);
+		env++;
+	}
 }
 
 /**
- * is_exit_command - Check if the command is the exit built-in
- * @command: The command to be checked
- * Return: 1 if it's the exit command, 0 otherwise
+ * prompt - returns to prompt. used to ignore SIGINT
+ * Return: nothing
  */
-int is_exit_command(char *command)
+
+
+void prompt()
 {
-    return strcmp(command, "exit") == 0;
+	printf("\n");
+	fflush(stdout);
 }
 
 /**
- * is_env_command - Check if the command is the env built-in
- * @command: The command to be checked
- * Return: 1 if it's the env command, 0 otherwise
+ * main - the main shell function!
+ * @ac: argument count
+ * @av: array of character pointers
+ * @env: a pointer to an array of character pointers
+ * Return: the exit status of the last executed command.
  */
-int is_env_command(char *command)
+
+int main(int ac, char **av, char **env)
 {
-    return strcmp(command, "env") == 0;
+	char input[MAX_COMMAND_LENGTH];
+	int status;
+	pid_t pid;
+	/* Temporary array of character pointers for command arguments */
+	char *tmp_av[MAX_ARGS + 1];
+	char *token;
+	int has_token;
+	/* Variable to store the exit status of the last executed command */
+	int last_exit_status = 0;
+
+	while (1)
+	{
+		/* Make sure the prompt is displayed before reading input */
+		fflush(stdout);
+		signal(SIGINT, prompt);
+		/* Check if Ctrl+D (EOF) is encountered */
+		if (fgets(input, sizeof(input), stdin) == NULL)
+		{
+			break;
+		}
+
+		/* Remove the newline character from the input */
+		input[strcspn(input, "\n")] = '\0';
+
+		/* Skip processing if input is empty */
+		if (strlen(input) == 0)
+		{
+			continue;
+		}
+
+		/* Tokenize the input into separate arguments and */
+		/* store them in tmp_av                           */
+		token = strtok(input, " ");
+		ac = 0;
+		has_token = 0;
+
+		while (token != NULL && ac < MAX_ARGS)
+		{
+			tmp_av[ac++] = token;
+			has_token = 1;
+			token = strtok(NULL, " ");
+		}
+
+		/* Check if there are no arguments */
+		if (!has_token)
+		{
+			continue;
+		}
+
+		tmp_av[ac] = NULL;
+
+		/* Check for the exit command */
+		if (strcmp(tmp_av[0], "exit") == 0)
+		{
+			/* Set the exit status to 0 as it's a normal termination */
+			last_exit_status = 0;
+			break; /* Exit the while loop and terminate the shell */
+		}
+
+		/* Check for built-in commands */
+		if (is_builtin_command(tmp_av[0]))
+		{
+			if (strcmp(tmp_av[0], "cd") == 0)
+			{
+				if (ac > 1)
+				{
+					if (chdir(tmp_av[1]) != 0)
+					{
+						perror("cd");
+						/* Set exit status to 1 for errors */
+						/* in built-in commands            */
+						last_exit_status = 1;
+					}
+				}
+			}
+			else if (strcmp(tmp_av[0], "env") == 0)
+			{
+				print_environment(env);
+			}
+		}
+		else
+		{
+			/* Copy the arguments from tmp_av to av before executing the command */
+			int i;
+			for (i = 0; i < ac; i++)
+			{
+				av[i] = tmp_av[i];
+			}
+			av[ac] = NULL;
+
+			pid = fork();
+			if (pid < 0)
+			{
+				perror("fork");
+				last_exit_status = 1; /* Set exit status to 1 for errors in fork */
+				exit(EXIT_FAILURE);
+			}
+			else if (pid == 0)
+			{
+				/* Child process */
+				if (execvp(av[0], av) == -1)
+				{
+					perror("execvp");
+					last_exit_status = 127; /* Indicates command not found */
+					exit(EXIT_FAILURE);
+				}
+			}
+			else
+			{
+				/* Parent process */
+				wait(&status);
+
+				/* Check if the process terminated normally or with an error */
+				if (WIFEXITED(status))
+				{
+					/* Get the exit status of the child process */
+					last_exit_status = WEXITSTATUS(status);
+				}
+				else
+				{
+					last_exit_status = 1; /* Status 1 indicates an error in the child process */
+				}
+			}
+		}
+	}
+	return (last_exit_status); /* Return the exit status of the last executed command */
 }
-
-/**
- * execute_env_command - Execute the env built-in command
- */
-void execute_env_command(void)
-{
-    extern char **environ;
-
-    /* Print the current environment */
-    char **env;
-    for (env = environ; *env != NULL; env++)
-    {
-        printf("%s\n", *env);
-    }
-}
-
-/**
- * main - Entry point of the simple shell
- * Return: Always 0
- */
-int main(void)
-{
-    char input[MAX_INPUT_SIZE];
-
-    while (1)
-    {
-        /* Display prompt */
-        display_prompt();
-
-        /* Read user input */
-        if (fgets(input, sizeof(input), stdin) == NULL)
-        {
-            /* Handle end of file (Ctrl+D) */
-            printf("\n");
-            break;
-        }
-
-        /* Remove newline character */
-        input[strcspn(input, "\n")] = '\0';
-
-        /* Check for built-in commands */
-        if (is_exit_command(input))
-        {
-            printf("Exiting the shell...\n");
-            break;
-        }
-        else if (is_env_command(input))
-        {
-            /* Execute the env command */
-            execute_env_command();
-        }
-        else
-        {
-            /* Execute the command in a child process */
-            execute_command(input);
-        }
-    }
-
-    return 0;
-}
-
