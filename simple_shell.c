@@ -45,7 +45,7 @@ void print_environment(char **env)
  */
 
 
-void prompt()
+void prompt(void)
 {
 	printf("\n");
 	fflush(stdout);
