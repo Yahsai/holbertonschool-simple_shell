@@ -1,35 +1,17 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef SHELL_H
+#define SHELL_H
 
-/**
- * display_prompt - Display the shell prompt
- */
-void display_prompt(void);
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
 
-/**
- * execute_command - Execute a command in a child process
- * @command: The command to be executed
- */
-void execute_command(char *command);
+#define MAX_COMMAND_LENGTH 100
+#define MAX_ARGS 10
 
-/**
- * is_exit_command - Check if the command is the exit built-in
- * @command: The command to be checked
- * Return: 1 if it's the exit command, 0 otherwise
- */
-int is_exit_command(char *command);
+int is_builtin_command(char *command);
+void print_environment(char **env);
+int execute_external_command(char **av, int *last_exit_status);
 
-/**
- * is_env_command - Check if the command is the env built-in
- * @command: The command to be checked
- * Return: 1 if it's the env command, 0 otherwise
- */
-int is_env_command(char *command);
-
-/**
- * execute_env_command - Execute the env built-in command
- */
-void execute_env_command(void);
-
-#endif /* MAIN_H */
-
+#endif
