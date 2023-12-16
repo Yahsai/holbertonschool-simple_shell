@@ -160,6 +160,7 @@ $
 
 ## Example basic simple shell:
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -174,8 +175,7 @@ void execute_command(char *command);
 int main(void) {
     char input[MAX_INPUT];
 
-    while (1)
-{
+    while (1) {
         printf("$ ");
 
         if (fgets(input, sizeof(input), stdin) == NULL) {
@@ -203,14 +203,13 @@ void execute_command(char *command) {
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
         perror("shell");
-    } else 
-{
-        do
-{
+    } else {
+        do {
             wpid = waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 }
+
 
 ## Authors
 
