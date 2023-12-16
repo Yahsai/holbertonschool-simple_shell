@@ -123,23 +123,38 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 Your shell should work in both interactive and non-interactive modes.
 ### Interactive mode:
 $ ./hsh
+
 ($) /bin/ls
+
 hsh main.c shell.c
+
 ($)
+
 ($) exit
+
 $
 
 ### Non-interactive mode:
 $ echo "/bin/ls" | ./hsh
+
 hsh main.c shell.c test_ls_2
+
 $
+
 $ cat test_ls_2
+
 /bin/ls
+
 /bin/ls
+
 $
+
 $ cat test_ls_2 | ./hsh
+
 hsh main.c shell.c test_ls_2
+
 hsh main.c shell.c test_ls_2
+
 $
 
 
