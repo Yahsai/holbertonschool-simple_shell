@@ -1,10 +1,10 @@
 # holbertonschool-simple_shell
 
-##Simple Shell
+## Simple Shell
 
 This is a simple UNIX command line interpreter, created as part of a project for Holberton School. The shell supports various features and commands, allowing users to interact with their system through a command-line interface.
 
-##General Information:
+## General Information:
 
     Who designed and implemented the original Unix operating system?
         Dennis Ritchie and Ken Thompson.
@@ -48,7 +48,7 @@ This is a simple UNIX command line interpreter, created as part of a project for
     What is EOF / "end-of-file"?
         EOF is a signal that indicates the end of a file or stream.
 
-##Requirements:
+## Requirements:
 
     Allowed editors: vi, vim, emacs.
     Compilation: gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
@@ -58,23 +58,23 @@ This is a simple UNIX command line interpreter, created as part of a project for
     Header files: All header files should be include guarded.
     System calls: Use system calls only when necessary.
 
-##Output:
+## Output:
 
 Unless specified otherwise, your program must have the exact same output as sh (/bin/sh) as well as the exact same error output. The only difference is when you print an error, the name of the program must be equivalent to your argv[0].
 
-###Example of error with sh:
+### Example of error with sh:
 $ echo "qwerty" | /bin/sh
 /bin/sh: 1: qwerty: not found
 $ echo "qwerty" | /bin/../bin/sh
 /bin/../bin/sh: 1: qwerty: not found
 
-###Same error with your program hsh:
+### Same error with your program hsh:
 $ echo "qwerty" | ./hsh
 ./hsh: 1: qwerty: not found
 $ echo "qwerty" | ./././hsh
 ./././hsh: 1: qwerty: not found
 
-##List of allowed functions and system calls:
+## List of allowed functions and system calls:
 
     All functions from string.h.
     access (man 2 access)
@@ -114,14 +114,14 @@ $ echo "qwerty" | ./././hsh
     wait4 (man 2 wait4)
     write (man 2 write)
 
-##Compilation
+## Compilation
 
 Your shell will be compiled this way:
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 
-##Testing
+## Testing
 Your shell should work in both interactive and non-interactive modes.
-###Interactive mode:
+### Interactive mode:
 $ ./hsh
 ($) /bin/ls
 hsh main.c shell.c
@@ -129,7 +129,7 @@ hsh main.c shell.c
 ($) exit
 $
 
-###Non-interactive mode:
+### Non-interactive mode:
 $ echo "/bin/ls" | ./hsh
 hsh main.c shell.c test_ls_2
 $
@@ -143,7 +143,7 @@ hsh main.c shell.c test_ls_2
 $
 
 
-##Example basic simple shell:
+## Example basic simple shell:
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -197,7 +197,7 @@ void execute_command(char *command) {
     }
 }
 
-##Authors
+## Authors
 
     Yahsai Santana
     Eunielis Serrano
