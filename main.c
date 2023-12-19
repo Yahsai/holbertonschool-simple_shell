@@ -1,6 +1,18 @@
 #include "shell.h"
 
 /**
+ * prompt - returns to prompt. used to ignore SIGINT
+ * @signo: signal number
+ * Return: nothing
+ */
+void prompt(int signo)
+{
+	(void)signo;
+	printf("\n$ ");
+	fflush(stdout);
+}
+
+/**
  * main - the main shell function.
  * @ac: argument count
  * @av: array of character pointers
@@ -9,6 +21,7 @@
  */
 int main(int ac, char **av, char **env)
 {
+	struct sigaction sa;
 	char input[MAX_COMMAND_LENGTH];
 	char *tmp_av[MAX_ARGS + 1];
 	char *token;
@@ -19,7 +32,8 @@ int main(int ac, char **av, char **env)
 	{
 		/* Make sure the prompt is displayed before reading input */
 		fflush(stdout);
-		signal(SIGINT, prompt);
+		sa.sa_handler = &prompt;
+		sigaction(SIGINT, &sa, NULL);
 
 		/* Check if Ctrl+D (EOF) is encountered */
 		if (fgets(input, sizeof(input), stdin) == NULL)
@@ -97,6 +111,6 @@ int main(int ac, char **av, char **env)
 			last_exit_status = execute_external_command(av);
 		}
 	}
-	return (last_exit_status); /* Return the exit status of the last executed command */
+	return (last_exit_status);
 }
 

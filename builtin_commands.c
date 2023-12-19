@@ -7,8 +7,8 @@
  */
 int is_builtin_command(char *command)
 {
-	if (strcmp(command, "exit") == 0 || strcmp(command, "clear")
-	== 0 || strcmp(command, "cd") == 0 || strcmp(command, "env") == 0)
+	if (strcmp(command, "exit") == 0 || strcmp(command, "clear") == 0 ||
+	    strcmp(command, "cd") == 0 || strcmp(command, "env") == 0)
 	{
 		return (1);
 	}
@@ -31,10 +31,12 @@ void print_environment(char **env)
 
 /**
  * prompt - returns to the prompt, used to ignore SIGINT.
+ * @signo: signal number
  * Return: nothing
  */
-void prompt(void)
+void prompt(int signo)
 {
+	(void)signo;
 	printf("\n");
 	fflush(stdout);
 }
