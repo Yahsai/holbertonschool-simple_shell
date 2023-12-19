@@ -35,7 +35,7 @@ The shell will display a prompt and wait for the user to type a command. A comma
     - Header files: All header files should be include guarded.
     - System calls: Use system calls only when necessary.
 
-
+---
 ### Output:
 
 Unless specified otherwise, your program must have the exact same output as sh (/bin/sh) as well as the exact same error output. The only difference is when you print an error, the name of the program must be equivalent to your argv[0].
