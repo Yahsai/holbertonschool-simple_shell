@@ -117,45 +117,57 @@ $ echo "qwerty" | ./././hsh
 ## Compilation
 
 Your shell will be compiled this way:
-gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
+`gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh`
 
 ## Testing
+
 Your shell should work in both interactive and non-interactive modes.
 ### Interactive mode:
-$ ./hsh
-
+`$ ./hsh
 ($) /bin/ls
-
 hsh main.c shell.c
-
 ($)
-
 ($) exit
+$`
+### Env
 
-$
+Prints out the current enviroment.
+
+### cd
+
+The cd command, also know as chdir, is a command-line shell command used 
+to change the current working directory in various operating systems
+
+### List of useful commands
+
+cat - the most common use of cat is to read the contents of the files
+
+cp - copy files to another file
+
+grep - searches a file for a specific pattern
+
+less - less is a command that display file contents or command output
+one page at a time in your terminal
+
+ls - lists all files and directories
+
+mv - moves one file into another file
+
+pwd - prints out the current working directory
 
 ### Non-interactive mode:
-$ echo "/bin/ls" | ./hsh
-
+`$ echo "/bin/ls" | ./hsh
 hsh main.c shell.c test_ls_2
+$`
 
-$
-
-$ cat test_ls_2
-
+`$ cat test_ls_2
 /bin/ls
-
 /bin/ls
+$`
 
-$
-
-$ cat test_ls_2 | ./hsh
-
+`$ cat test_ls_2 | ./hsh
 hsh main.c shell.c test_ls_2
-
-hsh main.c shell.c test_ls_2
-
-$
+$`
 
 
 ## Example basic simple shell:
@@ -210,6 +222,12 @@ void execute_command(char *command) {
     }
 }
 
+### Installation
+
+* - git clone git@github.com:Yahsai/holbertonschool-simple_shell.git
+* - cd simple_shell
+* - gcc -Wall -Werror -Wextra -pedantic * .c -o hsh
+* - Enjoy it
 
 ## Authors
 
