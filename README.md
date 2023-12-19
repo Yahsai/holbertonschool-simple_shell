@@ -22,7 +22,6 @@ The shell will display a prompt and wait for the user to type a command. A comma
    - Execute simple commands (one word only).
    - Handle errors gracefully, including when an executable cannot be found.
    - Handle the "end of file" condition (Ctrl+D) to exit the shell.
-
 ---
 
 ## Requirements:
@@ -34,7 +33,6 @@ The shell will display a prompt and wait for the user to type a command. A comma
     - Functions per file: No more than 5 functions per file.
     - Header files: All header files should be include guarded.
     - System calls: Use system calls only when necessary.
-
 ---
 ### Output:
 
