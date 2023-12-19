@@ -64,6 +64,7 @@ int main(int ac, char **av, char **env)
 
 	while (1)
 	{
+		write(1, "$ ", 2);
 		fflush(stdout);
 
 		if (fgets(input, sizeof(input), stdin) == NULL)
@@ -147,19 +148,19 @@ int main(int ac, char **av, char **env)
 			}
 			else
 			{
-				wait(&status);
-
-				if (WIFEXITED(status))
+				if (wait(&status))
 				{
-					last_exit_status = WEXITSTATUS(status);
+					 (WIFEXITED(status));
+					 {
+						last_exit_status = WEXITSTATUS(status);
+					 }
 				}
-				else
-				{
-					last_exit_status = 1;
+					 else
+					 {
+						last_exit_status = 1;
 				}
 			}
 		}
 	}
-
-	return last_exit_status;
+	return (last_exit_status);
 }
