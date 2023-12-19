@@ -25,14 +25,24 @@ The shell will display a prompt and wait for the user to type a command. A comma
 ---
 
 ## Requirements
-
-    - Allowed editors: vi, vim, emacs.
-    - Compilation: gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
-    - Code style: Follow the Betty style. It will be checked using betty-style.pl and betty-doc.pl.
-    - Memory leaks: Your shell should not have any memory leaks.
-    - Functions per file: No more than 5 functions per file.
-    - Header files: All header files should be include guarded.
-    - System calls: Use system calls only when necessary.
+  **Allowed Editors:**
+   - You are allowed to use `vi`, `vim`, or `emacs` as your text editors.
+  **Compilation:**
+   - All files will be compiled on Ubuntu 20.04 LTS using `gcc`, with the following options: `-Wall -Werror -Wextra -pedantic -std=gnu89`.
+  **File Formatting:**
+   - All your source code files should end with a new line.
+  **README File:**
+   - A `README.md` file must be present at the root of the project folder. This file should provide relevant information about the project.
+  **Coding Style:**
+   - Your code should adhere to the Betty style. It will be checked using `betty-style.pl` and `betty-doc.pl`.
+  **Memory Leaks:**
+   - Ensure that your shell does not have any memory leaks.
+  **Function Limit:**
+   - Each source code file should contain no more than 5 functions.
+  **Header Files:**
+   - All header files should be include guarded to prevent multiple inclusion.
+  **System Calls:**
+   - Use system calls only when necessary. Provide comments or documentation explaining the reason for using a system call.
 ---
 
 ### Output:
