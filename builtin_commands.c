@@ -37,7 +37,7 @@ void print_environment(char **env)
 void prompt(int signo)
 {
 	(void)signo;
-	printf("\n");
+	printf("\n$ ");
 	fflush(stdout);
 }
 

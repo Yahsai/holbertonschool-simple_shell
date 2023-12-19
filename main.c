@@ -1,18 +1,6 @@
 #include "shell.h"
 
 /**
- * prompt - returns to prompt. used to ignore SIGINT
- * @signo: signal number
- * Return: nothing
- */
-void prompt(int signo)
-{
-	(void)signo;
-	printf("\n$ ");
-	fflush(stdout);
-}
-
-/**
  * main - the main shell function.
  * @ac: argument count
  * @av: array of character pointers
