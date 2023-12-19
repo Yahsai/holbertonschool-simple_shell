@@ -24,7 +24,7 @@ The shell will display a prompt and wait for the user to type a command. A comma
    - Handle the "end of file" condition (Ctrl+D) to exit the shell.
 ---
 
-## Requirements:
+## Requirements
 
     - Allowed editors: vi, vim, emacs.
     - Compilation: gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
