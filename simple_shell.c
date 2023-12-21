@@ -5,174 +5,114 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define MAX_COMMAND_LENGTH 1024
+#define MAX_COMMAND_LENGTH 100
+#define MAX_ARGS 10
 
 /**
- * prompt - Handles SIGINT signal for a graceful prompt exit
- * @signo: The signal number
- *
- * Return: Nothing
- */
-void prompt(int signo);
-
-/**
- * handle_exit - Handles the "exit" command, exiting the shell
- *
- * Return: Nothing
- */
-void handle_exit(void);
-
-/**
- * find_command - Finds the full path of a command in the PATH
- * @command: The command to find
- * @path: The PATH environment variable
- *
- * Return: The full path of the command if found, NULL otherwise
- */
-char *find_command(const char *command, const char *path);
-
-/**
- * main - Simple shell main function
- *
- * Return: Always 0
- */
-int main(void)
-{
-	signal(SIGINT, prompt);
-
-	while (1)
-	{
-		char input[MAX_COMMAND_LENGTH];
-		ssize_t bytesRead;
-		pid_t pid;
-		char *full_path;
-
-		write(STDOUT_FILENO, "$ ", 2);
-
-		bytesRead = read(STDIN_FILENO, input, sizeof(input));
-		if (bytesRead == -1)
-		{
-			perror("read");
-			exit(EXIT_FAILURE);
-		}
-
-		if (bytesRead == 0)
-		{
-			break;
-		}
-
-		input[bytesRead - 1] = '\0';
-
-		if (strcmp(input, "exit") == 0)
-		{
-			handle_exit();
-			break;
-		}
-
-		full_path = find_command(input, getenv("PATH"));
-
-		if (full_path != NULL)
-		{
-			int status;
-
-			pid = fork();
-			if (pid == 0)
-			{
-				char *args[2];
-
-				args[0] = full_path;
-				args[1] = NULL;
-
-				if (execv(full_path, args) == -1)
-				{
-					perror("execv");
-					exit(EXIT_FAILURE);
-				}
-			}
-			else if (pid < 0)
-			{
-				perror("fork");
-				exit(EXIT_FAILURE);
-			}
-			else
-			{
-				do
-
-				{
-					waitpid(pid, &status, WUNTRACED);
-				} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-
-				free(full_path);
-			}
-		}
-		else
-		{
-			fprintf(stderr, "./hsh: 1: %s: not found\n", input);
-		}
-	}
-
-	return (0);
-}
-
-/**
- * find_command - Finds the full path of a command in the PATH
- * @command: The command to find
- * @path: The PATH environment variable
- *
- * Return: The full path of the command if found, NULL otherwise
- */
-char *find_command(const char *command, const char *path)
-{
-	char *token;
-	char *path_copy = strdup(path);
-
-	token = strtok(path_copy, ":");
-	while (token != NULL)
-	{
-		size_t full_path_len = strlen(token) + strlen(command) + 2;
-		char *full_path = malloc(full_path_len);
-
-		if (full_path == NULL)
-		{
-			perror("malloc");
-			exit(EXIT_FAILURE);
-		}
-		snprintf(full_path, full_path_len, "%s/%s", token, command);
-
-		if (access(full_path, X_OK) == 0)
-		{
-			free(path_copy);
-			return (full_path);
-		}
-
-		free(full_path);
-		token = strtok(NULL, ":");
-	}
-
-	free(path_copy);
-	return (NULL);
-}
-
-/**
- * handle_exit - Handles the "exit" command, exiting the shell
- *
- * Return: Nothing
- */
-void handle_exit(void)
-{
-	printf("Exiting the shell. Goodbye!\n");
-	exit(EXIT_SUCCESS);
-}
-
-/**
- * prompt - Handles SIGINT signal for a graceful prompt exit
+ * prompt - Handles the SIGINT signal for a graceful prompt exit
  * @signo: The signal number
  *
  * Return: Nothing
  */
 void prompt(int signo)
 {
-	(void)signo;
-	write(STDOUT_FILENO, "\n$ ", 3);
+    (void)signo;
+    printf("($) ");
+    fflush(stdout);
+}
+
+/**
+ * main - Main function of the program
+ * @ac: Number of command line arguments
+ * @av: Array of command line arguments
+ * @env: Array of program environment variables
+ *
+ * Return: The program exit code
+ */
+int main(int ac, char **av, char **env)
+{
+    char input[MAX_COMMAND_LENGTH];
+    int status;
+    pid_t pid;
+    char *tmp_av[MAX_ARGS + 1];
+    char *token;
+    int has_token;
+    int last_exit_status = 0;
+
+    signal(SIGINT, prompt);
+
+    while (1)
+    {
+        printf("($) ");
+        fflush(stdout);
+
+        if (fgets(input, sizeof(input), stdin) == NULL)
+        {
+            break;
+        }
+
+        input[strcspn(input, "\n")] = '\0';
+
+        if (strlen(input) == 0)
+        {
+            continue;
+        }
+
+        token = strtok(input, " ");
+        ac = 0;
+        has_token = 0;
+
+        while (token != NULL && ac < MAX_ARGS)
+        {
+            tmp_av[ac++] = token;
+            has_token = 1;
+            token = strtok(NULL, " ");
+        }
+
+        if (!has_token)
+        {
+            continue;
+        }
+
+        tmp_av[ac] = NULL;
+
+        if (strcmp(tmp_av[0], "exit") == 0)
+        {
+            last_exit_status = 0;
+            break;
+        }
+
+        pid = fork();
+        if (pid < 0)
+        {
+            perror("fork");
+            last_exit_status = 1;
+            exit(EXIT_FAILURE);
+        }
+        else if (pid == 0)
+        {
+            if (execvp(tmp_av[0], tmp_av) == -1)
+            {
+                perror("execvp");
+                last_exit_status = 127;
+                exit(EXIT_FAILURE);
+            }
+        }
+        else
+        {
+            wait(&status);
+
+            if (WIFEXITED(status))
+            {
+                last_exit_status = WEXITSTATUS(status);
+            }
+            else
+            {
+                last_exit_status = 1;
+            }
+        }
+    }
+
+    return last_exit_status;
 }
 
