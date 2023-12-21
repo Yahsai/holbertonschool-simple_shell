@@ -1,113 +1,156 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 
 #define MAX_COMMAND_LENGTH 100
 #define MAX_ARGS 10
 
-/**
- * prompt - Handles SIGINT signal for a graceful prompt exit
- * @signo: The signal number
- *
- * Return: Nothing
- */
-void prompt(int signo)
-{
-    (void)signo;
-    printf("\n($) ");
-    fflush(stdout);
-}
+char *get_full_path(char *command);
+char **tokenize_command(char *command);
+void execute_command(char **tokens, char **env);
 
-/**
- * main - Entry point for the simple shell
- * 
- * Return: Exit status
- */
 int main(void)
 {
     char input[MAX_COMMAND_LENGTH + 1];
-    int status;
-    pid_t pid;
-    char *tmp_av[MAX_ARGS + 1];
-    int ac;
-    char *token;
-    int has_token;
-    int last_exit_status = 0;
-
-    signal(SIGINT, prompt);
-
+    char **tokens;
+    
     while (1)
     {
         printf("($) ");
         fflush(stdout);
 
         if (fgets(input, sizeof(input), stdin) == NULL)
-        {
             break;
-        }
 
         input[strcspn(input, "\n")] = '\0';
 
         if (strlen(input) == 0)
-        {
             continue;
-        }
 
-        has_token = 0;
-
-        for (ac = 0, token = strtok(input, " "); token != NULL && ac < MAX_ARGS; token = strtok(NULL, " "))
-        {
-            tmp_av[ac++] = token;
-            has_token = 1;
-        }
-
-        if (!has_token)
-        {
+        tokens = tokenize_command(input);
+        if (tokens == NULL)
             continue;
-        }
 
-        tmp_av[ac] = NULL;
+        execute_command(tokens, environ);
 
-        if (strcmp(tmp_av[0], "exit") == 0)
+        // Free memory allocated for tokens
+        for (int i = 0; tokens[i] != NULL; i++)
         {
-            last_exit_status = 0;
-            break;
+            free(tokens[i]);
         }
-
-        pid = fork();
-        if (pid < 0)
-        {
-            perror("fork");
-            last_exit_status = 1;
-            exit(EXIT_FAILURE);
-        }
-        else if (pid == 0)
-        {
-            if (execvp(tmp_av[0], tmp_av) == -1)
-            {
-                perror("execvp");
-                last_exit_status = 127;
-                exit(EXIT_FAILURE);
-            }
-        }
-        else
-        {
-            wait(&status);
-
-            if (WIFEXITED(status))
-            {
-                last_exit_status = WEXITSTATUS(status);
-            }
-            else
-            {
-                last_exit_status = 1;
-            }
-        }
+        free(tokens);
     }
 
-    return last_exit_status;
+    return 0;
+}
+
+char *get_full_path(char *command)
+{
+    char *comd_path = "/bin/";
+    char *full_path;
+
+    if (access(command, X_OK) == 0)
+    {
+        full_path = strdup(command);
+        if (full_path == NULL)
+        {
+            perror("malloc");
+            return NULL;
+        }
+        return full_path;
+    }
+
+    full_path = malloc(strlen(comd_path) + strlen(command) + 1);
+    if (full_path == NULL)
+    {
+        perror("malloc");
+        return NULL;
+    }
+
+    sprintf(full_path, "%s%s", comd_path, command);
+
+    if (access(full_path, X_OK) != 0)
+    {
+        perror("Command not found");
+        free(full_path);
+        return NULL;
+    }
+
+    return full_path;
+}
+
+char **tokenize_command(char *command)
+{
+    char *token;
+    char **tokens = NULL;
+    int index = 0;
+
+    token = strtok(command, " \n");
+
+    while (token != NULL)
+    {
+        tokens = realloc(tokens, sizeof(char *) * (index + 1));
+        if (tokens == NULL)
+        {
+            perror("realloc");
+            return NULL;
+        }
+
+        tokens[index] = strdup(token);
+        if (tokens[index] == NULL)
+        {
+            perror("malloc");
+            free(tokens);
+            return NULL;
+        }
+
+        index++;
+        token = strtok(NULL, " \n");
+    }
+
+    tokens = realloc(tokens, sizeof(char *) * (index + 1));
+    if (tokens == NULL)
+    {
+        perror("realloc");
+        return NULL;
+    }
+
+    tokens[index] = NULL;
+
+    return tokens;
+}
+
+void execute_command(char **tokens, char **env)
+{
+    char *full_path = get_full_path(tokens[0]);
+
+    if (full_path == NULL)
+        return;
+
+    free(tokens[0]);
+    tokens[0] = full_path;
+
+    pid_t pid = fork();
+
+    if (pid == -1)
+    {
+        perror("fork");
+        return;
+    }
+
+    if (pid == 0)
+    {
+        execve(tokens[0], tokens, env);
+        perror("execve");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        int status;
+        waitpid(pid, &status, 0);
+    }
 }
 
