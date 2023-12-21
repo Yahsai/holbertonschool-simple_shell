@@ -58,7 +58,7 @@ int main(void)
     char input[MAX_COMMAND_LENGTH];
     int status;
     pid_t pid;
-    char *tmp_av[MAX_ARGS + 2];  // Increased the size by 2 to accommodate additional argument
+    char *tmp_av[MAX_ARGS + 3];  /* Increased the size by 3 to accommodate additional arguments*/
     char *token;
     int ac;
     int has_token;
@@ -93,9 +93,15 @@ int main(void)
 
         while (token != NULL && ac < MAX_ARGS)
         {
+            /* Trim leading spaces */
+            while (*token == ' ')
+            {
+                token++;
+            }
+
             tmp_av[ac++] = token;
             has_token = 1;
-            token = strtok(NULL, " ");
+            token = strtok(NULL, "\n");
         }
 
         if (!has_token)
@@ -103,9 +109,10 @@ int main(void)
             continue;
         }
 
-        // Append NULL and an additional argument ("-l") for "ls" command with options
+        /* Append NULL and additional arguments for "ls" command with options */
         tmp_av[ac++] = NULL;
         tmp_av[ac++] = "-l";
+        tmp_av[ac++] = "--color=auto";
 
         if (strcmp(tmp_av[0], "exit") == 0)
         {
