@@ -58,7 +58,7 @@ int main(void)
     char input[MAX_COMMAND_LENGTH];
     int status;
     pid_t pid;
-    char *tmp_av[MAX_ARGS + 1];
+    char *tmp_av[MAX_ARGS + 2];  // Increased the size by 2 to accommodate additional argument
     char *token;
     int ac;
     int has_token;
@@ -103,7 +103,9 @@ int main(void)
             continue;
         }
 
-        tmp_av[ac] = NULL;
+        // Append NULL and an additional argument ("-l") for "ls" command with options
+        tmp_av[ac++] = NULL;
+        tmp_av[ac++] = "-l";
 
         if (strcmp(tmp_av[0], "exit") == 0)
         {
@@ -115,9 +117,9 @@ int main(void)
         {
             if (strcmp(tmp_av[0], "cd") == 0)
             {
-                if (ac > 1)
+                if (ac > 2)
                 {
-                    if (chdir(tmp_av[1]) != 0)
+                    if (chdir(tmp_av[2]) != 0)
                     {
                         perror("cd");
                         last_exit_status = 1;
@@ -161,10 +163,8 @@ int main(void)
 
                 close(pipefd[1]);
 
-                /* Ejecutar el comando con ruta absoluta */
                 execvp(argv[0], argv);
 
-                /* Si llega aquí, la ejecución del comando falló */
                 perror("execvp");
                 last_exit_status = 127;
                 exit(EXIT_FAILURE);
@@ -173,21 +173,9 @@ int main(void)
             {
                 close(pipefd[1]);
 
-                /*Check if the command is "ls"*/
-                if (strcmp(tmp_av[0], "ls") == 0)
+                while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
                 {
-                    while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
-                    {
-                        /* Print only the expected lines for "ls" command*/
-                        write(STDOUT_FILENO, buffer, bytesRead);
-                    }
-                }
-                else
-                {
-                    while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
-                    {
-                        write(STDOUT_FILENO, buffer, bytesRead);
-                    }
+                    write(STDOUT_FILENO, buffer, bytesRead);
                 }
 
                 close(pipefd[0]);
