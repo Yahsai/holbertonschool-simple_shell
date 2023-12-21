@@ -159,10 +159,8 @@ int main(void)
 
                 close(pipefd[1]);
 
-                // Ejecutar el comando con ruta absoluta
                 execvp(argv[0], argv);
 
-                // Si llega aquí, la ejecución del comando falló
                 perror("execvp");
                 last_exit_status = 127;
                 exit(EXIT_FAILURE);
