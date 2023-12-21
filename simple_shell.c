@@ -176,7 +176,7 @@ int main(void)
                     totalBytesRead += bytesRead;
                 }
 
-                // Print the total buffer content
+                /* Print the total buffer content */
                 write(STDOUT_FILENO, totalBuffer, totalBytesRead);
 
                 close(pipefd[0]);
