@@ -51,6 +51,10 @@ void prompt(int signo)
     fflush(stdout);
 }
 
+/**
+ * main - entry point for the shell
+ * Return: exit status
+ */
 int main(void)
 {
     char input[MAX_COMMAND_LENGTH];
@@ -62,15 +66,14 @@ int main(void)
     int has_token;
     int last_exit_status = 0;
 
-    ssize_t bytesRead;  /*  Move the declaration here */
+    ssize_t bytesRead;
+    char buffer[1024];
 
     signal(SIGINT, prompt);
 
     while (1)
     {
-        char buffer[1024];
-
-        write(STDOUT_FILENO, "$ ", 2);
+        write(1, "$ ", 2);
         fflush(stdout);
 
         if (fgets(input, sizeof(input), stdin) == NULL)
