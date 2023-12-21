@@ -114,7 +114,36 @@ int main(int ac, char **av, char **env)
 			}
 			else if (strcmp(tmp_av[0], "env") == 0)
 			{
-				print_environment(env);
+				 pid = fork();
+
+				if (pid < 0)
+				{
+					perror("fork");
+					last_exit_status = 1;
+					exit(EXIT_FAILURE);
+				}
+				else if (pid == 0)
+				{
+					// Child process
+					// print_environment(env);
+					exit(EXIT_SUCCESS);
+				}
+				else
+				{
+					// Parent process
+					if (wait(&status) != -1)
+					{
+						if (WIFEXITED(status))
+						{
+							last_exit_status = WEXITSTATUS(status);
+						}
+						else
+						{
+							last_exit_status = 1;
+						}
+					}
+				}
+				
 			}
 		}
 		else
