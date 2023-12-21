@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 
 #define MAX_INPUT_SIZE 1024
+#define MAX_TOKENS 100
 
 void execute_command(char *command) {
     pid_t pid = fork();
@@ -25,8 +26,28 @@ void execute_command(char *command) {
     }
 }
 
+void set_path(char *path) {
+    setenv("PATH", path, 1);
+}
+
 int main() {
     char input[MAX_INPUT_SIZE];
+
+    // Test cases
+    // TODO: Add more cases based on your specific requirements
+
+    // Execute ls
+    execute_command("/bin/ls");
+
+    // Copy the file /bin/ls to hbtn_ls and execute ./.././../hbtn_ls /var
+    system("cp /bin/ls hbtn_ls");
+    set_path("./.././../");
+    execute_command("hbtn_ls /var");
+
+    // Execute ls -l
+    execute_command("ls -l");
+
+    // ...
 
     while (1) {
         // Display shell prompt
