@@ -11,9 +11,9 @@ extern char **environ;
 #define MAX_ARGS 10
 
 /**
- * is_builtin_command - determina si el comando dado es interno o no
- * @command: el comando dado
- * Retorna: 1 si es interno, 0 si no lo es
+ * is_builtin_command - determines whether given command is built-in or not
+ * @command: the given command
+ * Return: 1 if built-in, 0 if not
  */
 int is_builtin_command(char *command)
 {
@@ -26,9 +26,9 @@ int is_builtin_command(char *command)
 }
 
 /**
- * print_environment - imprime las variables de entorno
- * @env: matriz de cadenas que contiene variables de entorno
- * Retorna: nada
+ * print_environment - prints the environment variables
+ * @env: array of strings containing environment variables
+ * Return: nothing
  */
 void print_environment(char **env)
 {
@@ -40,13 +40,13 @@ void print_environment(char **env)
 }
 
 /**
- * prompt - vuelve al indicador. Utilizado para ignorar SIGINT
- * @signo: el número de señal
- * Retorna: nada
+ * prompt - returns to prompt. Used to ignore SIGINT
+ * @signo: the signal number
+ * Return: nothing
  */
 void prompt(int signo)
 {
-    (void)signo; /* Ignorar el parámetro no utilizado para evitar una advertencia */
+    (void)signo; /* Ignore the unused parameter to avoid a warning */
     printf("\n");
     fflush(stdout);
 }
@@ -62,7 +62,7 @@ int main(void)
     int has_token;
     int last_exit_status = 0;
 
-    ssize_t bytesRead; /* Mover la declaración aquí */
+    ssize_t bytesRead;  /*  Move the declaration here */
 
     signal(SIGINT, prompt);
 
