@@ -6,7 +6,8 @@
 #include <sys/wait.h>
 
 #define MAX_COMMAND_LENGTH 100
-#define MAX_ARGS 10
+
+extern char **environ;
 
 char *get_full_path(char *command);
 char **tokenize_command(char *command);
@@ -16,7 +17,7 @@ int main(void)
 {
     char input[MAX_COMMAND_LENGTH + 1];
     char **tokens;
-    
+
     while (1)
     {
         printf("($) ");
@@ -50,47 +51,48 @@ int main(void)
 char *get_full_path(char *command)
 {
     char *comd_path = "/bin/";
-    char *full_path;
+    char *conpath;
 
     if (access(command, X_OK) == 0)
     {
-        full_path = strdup(command);
-        if (full_path == NULL)
+        conpath = strdup(command);
+        if (conpath == NULL)
         {
             perror("malloc");
             return NULL;
         }
-        return full_path;
+        return conpath;
     }
 
-    full_path = malloc(strlen(comd_path) + strlen(command) + 1);
-    if (full_path == NULL)
+    conpath = malloc(strlen(comd_path) + strlen(command) + 1);
+    if (conpath == NULL)
     {
         perror("malloc");
         return NULL;
     }
 
-    sprintf(full_path, "%s%s", comd_path, command);
-
-    if (access(full_path, X_OK) != 0)
+    sprintf(conpath, "%s%s", comd_path, command);
+    if (access(conpath, X_OK) != 0)
     {
         perror("Command not found");
-        free(full_path);
+        free(conpath);
         return NULL;
     }
 
-    return full_path;
+    return conpath;
 }
 
 char **tokenize_command(char *command)
 {
-    char *token;
+    char *tok = NULL;
     char **tokens = NULL;
     int index = 0;
 
-    token = strtok(command, " \n");
+    tok = strtok(command, " \n");
+    if (tok == NULL)
+        return NULL;
 
-    while (token != NULL)
+    while (tok != NULL)
     {
         tokens = realloc(tokens, sizeof(char *) * (index + 1));
         if (tokens == NULL)
@@ -98,17 +100,9 @@ char **tokenize_command(char *command)
             perror("realloc");
             return NULL;
         }
-
-        tokens[index] = strdup(token);
-        if (tokens[index] == NULL)
-        {
-            perror("malloc");
-            free(tokens);
-            return NULL;
-        }
-
+        tokens[index] = strdup(tok);
         index++;
-        token = strtok(NULL, " \n");
+        tok = strtok(NULL, " \n");
     }
 
     tokens = realloc(tokens, sizeof(char *) * (index + 1));
@@ -119,7 +113,6 @@ char **tokenize_command(char *command)
     }
 
     tokens[index] = NULL;
-
     return tokens;
 }
 
