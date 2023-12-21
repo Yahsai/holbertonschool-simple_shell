@@ -54,7 +54,7 @@ int main(int ac, char **av, char **env)
 	char *token;
 	int has_token;
 	int last_exit_status = 0;
-
+	(void)env;
 	signal(SIGINT, prompt);
 
 	while (1)
@@ -124,13 +124,10 @@ int main(int ac, char **av, char **env)
 				}
 				else if (pid == 0)
 				{
-					// Child process
-					// print_environment(env);
 					exit(EXIT_SUCCESS);
 				}
 				else
 				{
-					// Parent process
 					if (wait(&status) != -1)
 					{
 						if (WIFEXITED(status))
