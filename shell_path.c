@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Declare strdup function */
+char *strdup(const char *s);
+
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -21,14 +25,14 @@ void execute_command(char *command) {
         perror("fork");
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
-        // Child process
+        /* Child process */
         execlp(command, command, NULL);
 
-        // If execlp fails
+        /* If execlp fails */
         perror("exec");
         exit(EXIT_FAILURE);
     } else {
-        // Parent process
+        /* Parent process */
         wait(NULL);
     }
 }
@@ -57,37 +61,37 @@ int main() {
     char input[MAX_INPUT_SIZE];
 
     while (1) {
-        // Display shell prompt
+        /* Display shell prompt */
         printf("($) ");
         fflush(stdout);
 
-        // Read user input
+        /* Read user input */
         if (fgets(input, sizeof(input), stdin) == NULL) {
-            // Handle Ctrl+D or other errors
+            /* Handle Ctrl+D or other errors */
             break;
         }
 
-        // Remove newline character
+        /* Remove newline character */
         input[strcspn(input, "\n")] = '\0';
 
-        // Check for the "exit" command
+        /* Check for the "exit" command */
         if (strcmp(input, "exit") == 0) {
             break;
         }
 
-        // Tokenize the input
+        /* Tokenize the input */
         char **tokens = tokenize_input(input);
 
         if (tokens[0] != NULL) {
-            // Execute the command
+            /* Execute the command */
             execute_command(tokens[0]);
 
-            // Free the allocated memory for tokens
+            /* Free the allocated memory for tokens */
             free_tokens(tokens);
         }
     }
 
-    printf("\n");  // Add a newline for better shell appearance
+    printf("\n"); /* Add a newline for better shell appearance */
     return 0;
 }
 
