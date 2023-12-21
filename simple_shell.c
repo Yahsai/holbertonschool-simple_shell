@@ -62,14 +62,13 @@ int main(void)
     int has_token;
     int last_exit_status = 0;
 
-    ssize_t bytesRead; /* Move the declaration here */
+    ssize_t bytesRead;
 
     signal(SIGINT, prompt);
 
     while (1)
     {
-        char totalBuffer[1024 * 10]; /* Adjust the size as necessary */
-        size_t totalBytesRead = 0;
+        char buffer[1024];
 
         write(STDOUT_FILENO, "$ ", 2);
         fflush(stdout);
@@ -160,24 +159,22 @@ int main(void)
 
                 close(pipefd[1]);
 
-                if (execvp(argv[0], argv) == -1)
-                {
-                    perror("execvp");
-                    last_exit_status = 127;
-                    exit(EXIT_FAILURE);
-                }
+                // Ejecutar el comando con ruta absoluta
+                execvp(argv[0], argv);
+
+                // Si llega aquí, la ejecución del comando falló
+                perror("execvp");
+                last_exit_status = 127;
+                exit(EXIT_FAILURE);
             }
             else
             {
                 close(pipefd[1]);
 
-                while ((bytesRead = read(pipefd[0], totalBuffer + totalBytesRead, sizeof(totalBuffer) - totalBytesRead)) > 0)
+                while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
                 {
-                    totalBytesRead += bytesRead;
+                    write(STDOUT_FILENO, buffer, bytesRead);
                 }
-
-                /* Print the total buffer content */
-                write(STDOUT_FILENO, totalBuffer, totalBytesRead);
 
                 close(pipefd[0]);
 
