@@ -5,7 +5,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 #define MAX_COMMAND_LENGTH 100
 #define MAX_ARGS 10

@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <signal.h>
+#include "main.h"
 
 #define MAX_COMMAND_LENGTH 100
 #define MAX_ARGS 10
@@ -64,7 +59,8 @@ int main(int ac, char **av, char **env)
 
 	while (1)
 	{
-		write(1, "$ ", 2);
+		if (isatty(0))			
+			write(1, "$ ", 2);
 		fflush(stdout);
 
 		if (fgets(input, sizeof(input), stdin) == NULL)
