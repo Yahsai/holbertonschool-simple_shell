@@ -25,14 +25,14 @@ int is_builtin_command(char *command)
  * @env: array of strings containing environment variables
  * Return: nothing
  */
-void print_environment(char **env)
+/*void print_environment(char **env)
 {
 	while (*env != NULL)
 	{
 		printf("%s\n", *env);
 		env++;
 	}
-}
+}*/
 
 /**
  * prompt - returns to prompt. Used to ignore SIGINT
