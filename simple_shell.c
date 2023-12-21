@@ -68,7 +68,7 @@ int main(void)
 
     while (1)
     {
-        char totalBuffer[1024 * 10]; // Adjust the size as necessary
+        char totalBuffer[1024 * 10]; /* Adjust the size as necessary */
         size_t totalBytesRead = 0;
 
         write(STDOUT_FILENO, "$ ", 2);
