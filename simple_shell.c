@@ -10,6 +10,8 @@ extern char **environ;
 #define MAX_COMMAND_LENGTH 100
 #define MAX_ARGS 10
 
+#define BUFFER_SIZE 1024
+
 /**
  * is_builtin_command - determines whether given command is built-in or not
  * @command: the given command
@@ -68,7 +70,7 @@ int main(void)
 
     while (1)
     {
-        char buffer[1024];
+        char buffer[BUFFER_SIZE];
 
         write(STDOUT_FILENO, "$ ", 2);
         fflush(stdout);
