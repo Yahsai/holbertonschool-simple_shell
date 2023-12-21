@@ -21,7 +21,7 @@ void execute_command(char *command) {
         perror("exec");
         exit(EXIT_FAILURE);
     } else {
-        // Parent process
+        /* Parent process */
         wait(NULL);
     }
 }
