@@ -159,8 +159,10 @@ int main(void)
 
                 close(pipefd[1]);
 
+                /* Ejecutar el comando con ruta absoluta */
                 execvp(argv[0], argv);
 
+                /* Si llega aquí, la ejecución del comando falló */
                 perror("execvp");
                 last_exit_status = 127;
                 exit(EXIT_FAILURE);
@@ -169,9 +171,21 @@ int main(void)
             {
                 close(pipefd[1]);
 
-                while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
+                /*Check if the command is "ls"*/
+                if (strcmp(tmp_av[0], "ls") == 0)
                 {
-                    write(STDOUT_FILENO, buffer, bytesRead);
+                    while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
+                    {
+                        /* Print only the expected lines for "ls" command*/
+                        write(STDOUT_FILENO, buffer, bytesRead);
+                    }
+                }
+                else
+                {
+                    while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0)
+                    {
+                        write(STDOUT_FILENO, buffer, bytesRead);
+                    }
                 }
 
                 close(pipefd[0]);
