@@ -11,9 +11,23 @@ extern char **environ;
 #define MAX_ARGS 10
 
 /**
- * is_builtin_command - determines whether given command is built-in or not
- * @command: the given command
- * Return: 1 if built-in, 0 if not
+ * prompt - Handle SIGINT signal for a graceful prompt exit
+ * @signo: The signal number
+ *
+ * Return: Nothing
+ */
+void prompt(int signo)
+{
+    (void)signo;
+    printf("\n$ ");
+    fflush(stdout);
+}
+
+/**
+ * is_builtin_command - Check if a command is a built-in command
+ * @command: The command to check
+ *
+ * Return: 1 if the command is built-in, 0 otherwise
  */
 int is_builtin_command(char *command)
 {
@@ -26,9 +40,10 @@ int is_builtin_command(char *command)
 }
 
 /**
- * print_environment - prints the environment variables
- * @env: array of strings containing environment variables
- * Return: nothing
+ * print_environment - Print the environment variables
+ * @env: Array of strings containing environment variables
+ *
+ * Return: Nothing
  */
 void print_environment(char **env)
 {
@@ -40,20 +55,9 @@ void print_environment(char **env)
 }
 
 /**
- * prompt - returns to prompt. Used to ignore SIGINT
- * @signo: the signal number
- * Return: nothing
- */
-void prompt(int signo)
-{
-    (void)signo; /* Ignore the unused parameter to avoid a warning */
-    printf("\n");
-    fflush(stdout);
-}
-
-/**
- * main - entry point for the shell
- * Return: exit status
+ * main - Entry point for the shell
+ *
+ * Return: Exit status
  */
 int main(void)
 {
@@ -73,7 +77,7 @@ int main(void)
 
     while (1)
     {
-        write(1, "$ ", 2);
+        printf("$ ");
         fflush(stdout);
 
         if (fgets(input, sizeof(input), stdin) == NULL)
@@ -192,6 +196,7 @@ int main(void)
             }
         }
     }
+
     return last_exit_status;
 }
 
