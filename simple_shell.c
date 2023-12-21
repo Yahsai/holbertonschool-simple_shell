@@ -65,6 +65,7 @@ int main(int ac, char **av, char **env)
 
 		if (fgets(input, sizeof(input), stdin) == NULL)
 		{
+			
 			break;
 		}
 

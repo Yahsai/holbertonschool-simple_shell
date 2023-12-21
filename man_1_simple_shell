@@ -1,0 +1,51 @@
+.TH SIMPLE_SHELL 1
+
+.SH NAME
+Simple Shell - command language Interpreter
+
+.SH SYPNOSIS
+#include "main.h"
+./hsh
+
+.SH DESCRIPTION
+The Simple Shell is a straightforward command language interpreter designed
+to process commands from standard input. It currently offers basic shell
+functionality, supporting the following features:
+
+- Execution of commands with arguments
+- Handling of environmental variables
+- Shell termination
+
+However, it currently lacks support for more advanced features such as:
+
+- Piping
+- Redirections
+- Pattern matching
+- Variable expansions
+
+The Simple Shell is intended for users seeking a minimalistic shell experience
+and does not include these advanced functionalities. Future updates may
+consider incorporating additional features.
+
+.SS INVOCATION
+.IP Interactive
+To invoke Simple Shell in interactive mode, type ./hsh.
+
+.IP Non-Interactive
+To invoke Simple Shell in non-interactive mode,
+use a pipe (e.g., echo "/bin/ls" | ./hsh).
+
+.IP [[flags]...[arguments]]
+Lists files in the current directory based on the user-provided flags.
+
+.SS SHELL BUILTIN COMMANDS
+.IP "env"
+Displays the environmental variables.
+.IP "exit"
+Exits the Simple Shell and returns to the original user shell.
+
+.SH BUGS
+No known bugs.
+
+.SH AUTHORS
+Yahsai Santana and Eunielis Serrano
