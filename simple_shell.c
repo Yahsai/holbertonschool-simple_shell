@@ -9,7 +9,7 @@
 #define MAX_ARGS 10
 
 /**
- * prompt - Handles the SIGINT signal for a graceful prompt exit
+ * prompt - Handles SIGINT signal for a graceful prompt exit
  * @signo: The signal number
  *
  * Return: Nothing
@@ -17,24 +17,22 @@
 void prompt(int signo)
 {
     (void)signo;
-    printf("($) ");
+    printf("\n($) ");
     fflush(stdout);
 }
 
 /**
- * main - Main function of the program
- * @ac: Number of command line arguments
- * @av: Array of command line arguments
- * @env: Array of program environment variables
- *
- * Return: The program exit code
+ * main - Entry point for the simple shell
+ * 
+ * Return: Exit status
  */
-int main(int ac, char **av, char **env)
+int main(void)
 {
-    char input[MAX_COMMAND_LENGTH];
+    char input[MAX_COMMAND_LENGTH + 1];
     int status;
     pid_t pid;
     char *tmp_av[MAX_ARGS + 1];
+    int ac;
     char *token;
     int has_token;
     int last_exit_status = 0;
@@ -58,15 +56,12 @@ int main(int ac, char **av, char **env)
             continue;
         }
 
-        token = strtok(input, " ");
-        ac = 0;
         has_token = 0;
 
-        while (token != NULL && ac < MAX_ARGS)
+        for (ac = 0, token = strtok(input, " "); token != NULL && ac < MAX_ARGS; token = strtok(NULL, " "))
         {
             tmp_av[ac++] = token;
             has_token = 1;
-            token = strtok(NULL, " ");
         }
 
         if (!has_token)
